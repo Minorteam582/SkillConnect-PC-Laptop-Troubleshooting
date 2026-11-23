@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fix Guide - SkillConnect</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.guide{max-width:760px;margin:40px auto;padding:0 5%;}
+.guide .summary{font-size:17px;margin-bottom:24px;}
+.step{display:flex;gap:16px;align-items:flex-start;background:var(--light);padding:18px;border-radius:12px;margin-bottom:14px;}
+.step-no{flex:0 0 38px;height:38px;border-radius:50%;background:var(--main);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px;}
+.btn.green{background:var(--main);}
+.btn.green:hover{background:#0b6f71;}
+.msg{display:none;margin-top:20px;padding:16px;border-radius:10px;background:var(--light);font-weight:500;}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="logo">Skill<span>Connect</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="search.html" class="active">Search Problem</a></li>
+    <li><a href="technicians.html">Technicians</a></li>
+    <li><a href="login.html">Login</a></li>
+  </ul>
+</nav>
+
+<div class="page-title"><h1 id="title">Fix Guide</h1></div>
+
+<div class="guide" id="guide"></div>
+
+<footer class="footer">&copy; 2026 SkillConnect | Group 43</footer>
+
+<script src="js/problems-data.js"></script>
+<script>
+const id = Number(new URLSearchParams(location.search).get('id'));
+const p = problems.find(x => x.id === id);
+const guide = document.getElementById('guide');
+
+if (p) {
+  document.getElementById('title').textContent = p.title;
+  guide.innerHTML = `
+    <p class="summary">${p.summary}</p>
+    ${p.steps.map((s, i) => `
+      <div class="step"><div class="step-no">${i + 1}</div><div>${s}</div></div>`).join('')}
+    <div class="actions">
+      <button class="btn green" onclick="solved()">Problem Solved</button>
+      <a href="technicians.html" class="btn">Not Solved? Book a Technician</a>
+      <a href="search.html" class="btn" style="background:var(--dark)">Back to Search</a>
+    </div>
+    <div class="msg" id="msg">Great! Glad we could help. Visit again if you face another problem.</div>`;
+} else {
+  guide.innerHTML = '<p>Problem not found. <a href="search.html">Go back to search</a></p>';
+}
+
+function solved() {
+  document.getElementById('msg').style.display = 'block';
+}
+</script>
+</body>
+</html>
