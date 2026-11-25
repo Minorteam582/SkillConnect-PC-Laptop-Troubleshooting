@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book PC / Laptop Specialist — ByteFix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+
+  <main class="container page-content">
+    <div class="page-header">
+      <a href="technicians.html" class="back-link">&larr; Back to Specialists</a>
+      <h1>Book a PC &amp; Laptop Repair Session</h1>
+      <p class="subtitle">Select your device details, common symptoms, and preferred time slot.</p>
+    </div>
+
+    <div class="booking-grid">
+      <!-- Left Column: Booking Form -->
+      <section class="card form-card">
+        <form id="bookingForm" novalidate>
+          <div class="form-group">
+            <label for="specialistSelect">Select Specialist</label>
+            <select id="specialistSelect" class="input" required></select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="deviceType">Device Type</label>
+              <select id="deviceType" class="input" required>
+                <option value="Windows Laptop">Windows Laptop</option>
+                <option value="MacBook">MacBook (Air / Pro)</option>
+                <option value="Desktop PC">Desktop PC</option>
+                <option value="Custom / Gaming Rig">Custom / Gaming Rig</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="deviceModel">Brand &amp; Model</label>
+              <input
+                type="text"
+                id="deviceModel"
+                class="input"
+                placeholder="e.g. HP Victus 15, MacBook Air M2"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Quick Issue Tags (Click to add)</label>
+            <div class="chip-group" id="issueChips">
+              <button type="button" class="chip" data-issue="Blue Screen / Boot Loop">Blue Screen / Boot Loop</button>
+              <button type="button" class="chip" data-issue="Overheating & Thermal Throttling">Overheating</button>
+              <button type="button" class="chip" data-issue="Slow OS / Virus & Malware Cleanup">Slow OS / Malware</button>
+              <button type="button" class="chip" data-issue="Screen Flicker / Hinges / Battery">Screen / Battery</button>
+              <button type="button" class="chip" data-issue="SSD Upgrade & Windows / Linux Install">SSD &amp; OS Setup</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="issueDescription">Problem Details</label>
+            <textarea
+              id="issueDescription"
+              class="input textarea"
+              rows="3"
+              placeholder="Describe what happened, any error codes, or recent updates..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Service Mode</label>
+            <div class="radio-cards">
+              <label class="radio-card active">
+                <input type="radio" name="serviceMode" value="Home / Dorm Visit" checked />
+                <div>
+                  <strong>Home / Dorm Visit</strong>
+                  <span>Troubleshooting at your location</span>
+                </div>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="serviceMode" value="Pickup & Lab Repair" />
+                <div>
+                  <strong>Pickup &amp; Lab Repair</strong>
+                  <span>For motherboard / soldering / deep tests</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bookingDate">Preferred Date</label>
+              <input type="date" id="bookingDate" class="input" required />
+            </div>
+            <div class="form-group">
+              <label for="timeSlot">Time Slot</label>
+              <select id="timeSlot" class="input" required>
+                <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
+                <option value="01:00 PM - 03:00 PM">01:00 PM - 03:00 PM</option>
+                <option value="05:30 PM - 07:30 PM">05:30 PM - 07:30 PM</option>
+                <option value="08:00 PM - 09:30 PM">08:00 PM - 09:30 PM</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="customerName">Your Name</label>
+              <input type="text" id="customerName" class="input" placeholder="Enter your full name" required />
+            </div>
+            <div class="form-group">
+              <label for="customerPhone">Phone Number</label>
+              <input type="tel" id="customerPhone" class="input" placeholder="10-digit mobile number" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="customerAddress">Address / Location</label>
+            <input type="text" id="customerAddress" class="input" placeholder="Street, landmark, area, city" required />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">Confirm Repair Booking</button>
+        </form>
+      </section>
+
+      <!-- Right Column: Specialist Preview & Summary -->
+      <aside class="card summary-card" id="summaryCard">
+        <div id="selectedSpecialistPreview" class="specialist-mini"></div>
+        <hr class="divider" />
+        <h3>Fare Estimate</h3>
+        <div class="summary-row">
+          <span>Diagnostic / Visit Fee</span>
+          <strong id="baseFeeDisplay">₹0</strong>
+        </div>
+        <div class="summary-row">
+          <span>Platform Protection (5%)</span>
+          <span id="platformFeeDisplay">₹0</span>
+        </div>
+        <div class="summary-row total">
+          <span>Estimated Total</span>
+          <strong id="totalFeeDisplay">₹0</strong>
+        </div>
+        <p class="note">
+          Final hardware spare part costs (if needed) are confirmed with you before replacement.
+        </p>
+      </aside>
+    </div>
+  </main>
+
+  <script src="js/technicians-data.js"></script>
+  <script>
+    (function () {
+      const STORAGE_KEY = "bytefix_pc_bookings_v1";
+      const list = Array.isArray(window.TECHNICIANS_DATA) ? window.TECHNICIANS_DATA : [];
+
+      const specialistSelect = document.getElementById("specialistSelect");
+      const previewEl = document.getElementById("selectedSpecialistPreview");
+      const baseFeeEl = document.getElementById("baseFeeDisplay");
+      const platformFeeEl = document.getElementById("platformFeeDisplay");
+      const totalFeeEl = document.getElementById("totalFeeDisplay");
+      const dateInput = document.getElementById("bookingDate");
+      const descInput = document.getElementById("issueDescription");
+      const form = document.getElementById("bookingForm");
+
+      function getBookings() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        } catch {
+          return [];
+        }
+      }
+
+      function saveBookings(items) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        updateBadge();
+      }
+
+      function updateBadge() {
+        const badge = document.getElementById("navBookingCount");
+        if (badge) badge.textContent = String(getBookings().length);
+      }
+
+      // Default date = tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      dateInput.min = new Date().toISOString().split("T")[0];
+      dateInput.value = tomorrow.toISOString().split("T")[0];
+
+      // Populate specialists dropdown
+      const params = new URLSearchParams(window.location.search);
+      const preselectedId = params.get("techId") || params.get("id");
+
+      specialistSelect.innerHTML = list
+        .map(
+          (t) =>
+            `<option value="${t.id}" ${String(t.id) === String(preselectedId) ? "selected" : ""}>${t.name} — ${t.specialty} (₹${t.visitFee})</option>`
+        )
+        .join("");
+
+      function renderSummary() {
+        const tech = list.find((t) => String(t.id) === String(specialistSelect.value)) || list[0];
+        if (!tech) return;
+
+        const base = Number(tech.visitFee || 299);
+        const platform = Math.round(base * 0.05);
+        const total = base + platform;
+
+        previewEl.innerHTML = `
+          <div class="avatar">${tech.name.split(" ").map((p) => p[0]).join("").slice(0, 2)}</div>
+          <div>
+            <h4>${tech.name}</h4>
+            <p class="muted">${tech.specialty} &bull; ★ ${tech.rating} (${tech.reviews} jobs)</p>
+            <span class="tag">${tech.experience}</span>
+          </div>
+        `;
+
+        baseFeeEl.textContent = `₹${base}`;
+        platformFeeEl.textContent = `₹${platform}`;
+        totalFeeEl.textContent = `₹${total}`;
+      }
+
+      // Issue chip click appends issue text
+      document.querySelectorAll("#issueChips .chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          chip.classList.toggle("active");
+          const issue = chip.dataset.issue;
+          const current = descInput.value.trim();
+          if (chip.classList.contains("active")) {
+            descInput.value = current ? `${current}, ${issue}` : issue;
+          } else {
+            descInput.value = current
+              .split(",")
+              .map((s) => s.trim())
+              .filter((s) => s && s !== issue)
+              .join(", ");
+          }
+        });
+      });
+
+      // Service mode active styling
+      document.querySelectorAll(".radio-card input").forEach((radio) => {
+        radio.addEventListener("change", () => {
+          document.querySelectorAll(".radio-card").forEach((c) => c.classList.remove("active"));
+          radio.closest(".radio-card").classList.add("active");
+        });
+      });
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        const tech = list.find((t) => String(t.id) === String(specialistSelect.value)) || list[0];
+        const base = Number(tech ? tech.visitFee : 299);
+        const total = base + Math.round(base * 0.05);
+        const serviceMode = document.querySelector('input[name="serviceMode"]:checked').value;
+
+        const newBooking = {
+          id: "BF-" + Math.floor(100000 + Math.random() * 900000),
+          technicianId: tech ? tech.id : "tech-1",
+          technicianName: tech ? tech.name : "PC Specialist",
+          specialty: tech ? tech.specialty : "PC & Laptop Repair",
+          deviceType: document.getElementById("deviceType").value,
+          deviceModel: document.getElementById("deviceModel").value.trim(),
+          issueDescription: descInput.value.trim(),
+          serviceMode,
+          date: dateInput.value,
+          timeSlot: document.getElementById("timeSlot").value,
+          customerName: document.getElementById("customerName").value.trim(),
+          customerPhone: document.getElementById("customerPhone").value.trim(),
+          customerAddress: document.getElementById("customerAddress").value.trim(),
+          estimatedTotal: total,
+          status: "Confirmed",
+          createdAt: new Date().toISOString()
+        };
+
+        const existing = getBookings();
+        existing.unshift(newBooking);
+        saveBookings(existing);
+
+        window.location.href = "my-bookings.html?booked=1";
+      });
+
+      specialistSelect.addEventListener("change", renderSummary);
+      renderSummary();
+      updateBadge();
+    })();
+  </script>
+</body>
+</html>

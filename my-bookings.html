@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Repair Bookings — ByteFix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  
+
+  <main class="container page-content">
+    <div id="successBanner" class="alert-banner" style="display: none;">
+      <div>
+        <strong>Repair Booking Confirmed!</strong>
+        <span>Your PC/Laptop specialist session has been scheduled.</span>
+      </div>
+      <button type="button" class="close-btn" id="closeBannerBtn">&times;</button>
+    </div>
+
+    <div class="page-header flex-between">
+      <div>
+        <h1>My Repair Bookings</h1>
+        <p class="subtitle">Track your upcoming PC &amp; laptop service sessions or re-book a specialist.</p>
+      </div>
+      <a href="booking.html" class="btn btn-primary">+ New Repair Booking</a>
+    </div>
+
+    <div class="filter-bar">
+      <div class="chip-group" id="statusFilters">
+        <button type="button" class="chip active" data-filter="All">All Bookings</button>
+        <button type="button" class="chip" data-filter="Confirmed">Confirmed</button>
+        <button type="button" class="chip" data-filter="Cancelled">Cancelled</button>
+      </div>
+    </div>
+
+    <div id="bookingsContainer" class="bookings-list"></div>
+  </main>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = "bytefix_pc_bookings_v1";
+      const container = document.getElementById("bookingsContainer");
+      const banner = document.getElementById("successBanner");
+      let activeFilter = "All";
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("booked") === "1" && banner) {
+        banner.style.display = "flex";
+        window.history.replaceState({}, "", "my-bookings.html");
+      }
+
+      document.getElementById("closeBannerBtn")?.addEventListener("click", () => {
+        banner.style.display = "none";
+      });
+
+      function getBookings() {
+        try {
+          const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+          if (Array.isArray(data) && data.length > 0) return data;
+        } catch (e) {}
+
+        // Initial sample booking so page isn't blank on first visit
+        const sample = [
+          {
+            id: "BF-482910",
+            technicianId: "tech-1",
+            technicianName: "Rahul Sharma",
+            specialty: "Hardware & Motherboard",
+            deviceType: "Windows Laptop",
+            deviceModel: "HP Victus 15",
+            issueDescription: "Overheating & Thermal Throttling, Fan Noise",
+            serviceMode: "Home / Dorm Visit",
+            date: new Date(Date.now() + 86400000).toISOString().split("T")[0],
+            timeSlot: "05:30 PM - 07:30 PM",
+            customerName: "Pushpraj Kumar",
+            customerPhone: "9876543210",
+            customerAddress: "Near Main Market",
+            estimatedTotal: 524,
+            status: "Confirmed"
+          }
+        ];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sample));
+        return sample;
+      }
+
+      function saveBookings(items) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        updateBadge(items);
+      }
+
+      function updateBadge(items) {
+        const badge = document.getElementById("navBookingCount");
+        if (badge) badge.textContent = String(items.length);
+      }
+
+      function renderBookings() {
+        const all = getBookings();
+        updateBadge(all);
+
+        const filtered =
+          activeFilter === "All"
+            ? all
+            : all.filter((b) => b.status.toLowerCase() === activeFilter.toLowerCase());
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="card empty-state">
+              <h3>No ${activeFilter === "All" ? "" : activeFilter} Bookings Found</h3>
+              <p class="muted">Need help with a slow PC, blue screen, or hardware upgrade?</p>
+              <a href="technicians.html" class="btn btn-primary">Browse PC Specialists</a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = filtered
+          .map((b) => {
+            const isCancelled = b.status === "Cancelled";
+            return `
+              <article class="card booking-item ${isCancelled ? "is-cancelled" : ""}">
+                <div class="booking-top">
+                  <div>
+                    <span class="booking-id">#${b.id}</span>
+                    <h3>${b.deviceType} — ${b.deviceModel}</h3>
+                    <p class="muted">Specialist: <strong>${b.technicianName}</strong> (${b.specialty})</p>
+                  </div>
+                  <span class="status-pill ${isCancelled ? "status-cancelled" : "status-confirmed"}">
+                    ${b.status}
+                  </span>
+                </div>
+
+                <div class="booking-details-grid">
+                  <div>
+                    <span class="detail-label">Issue Reported</span>
+                    <p>${b.issueDescription}</p>
+                  </div>
+                  <div>
+                    <span class="detail-label">Schedule &amp; Mode</span>
+                    <p>${b.date} &bull; ${b.timeSlot}</p>
+                    <small class="muted">${b.serviceMode}</small>
+                  </div>
+                  <div>
+                    <span class="detail-label">Estimated Total</span>
+                    <p class="price-text">₹${b.estimatedTotal}</p>
+                  </div>
+                </div>
+
+                <div class="booking-actions">
+                  <a href="booking.html?techId=${encodeURIComponent(b.technicianId)}" class="btn btn-outline">
+                    Book Again
+                  </a>
+                  ${
+                    !isCancelled
+                      ? `<button type="button" class="btn btn-danger-outline" data-cancel-id="${b.id}">Cancel Booking</button>`
+                      : ""
+                  }
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+
+        document.querySelectorAll("[data-cancel-id]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const id = btn.getAttribute("data-cancel-id");
+            const updated = getBookings().map((item) =>
+              item.id === id ? { ...item, status: "Cancelled" } : item
+            );
+            saveBookings(updated);
+            renderBookings();
+          });
+        });
+      }
+
+      document.querySelectorAll("#statusFilters .chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          document.querySelectorAll("#statusFilters .chip").forEach((c) => c.classList.remove("active"));
+          chip.classList.add("active");
+          activeFilter = chip.dataset.filter;
+          renderBookings();
+        });
+      });
+
+      renderBookings();
+    })();
+  </script>
+</body>
+</html>

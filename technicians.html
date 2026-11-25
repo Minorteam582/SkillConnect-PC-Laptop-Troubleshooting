@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PC &amp; Laptop Specialists — Repair Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  
+
+  <main class="container page-content">
+    <div class="page-header">
+      <h1>PC &amp; Laptop Troubleshooting Specialists</h1>
+      <p class="subtitle">Find verified engineers for hardware diagnostics, OS/BSOD fixes, MacBooks, and custom rigs.</p>
+    </div>
+
+    <!-- Search & Sort Controls -->
+    <div class="card toolbar-card">
+      <div class="toolbar-top">
+        <input
+          type="search"
+          id="searchInput"
+          class="input"
+          placeholder="Search by specialist, issue (e.g. BSOD, SSD, MacBook, Motherboard)..."
+        />
+        <select id="sortSelect" class="input sort-select">
+          <option value="rating">Sort: Highest Rated</option>
+          <option value="price-asc">Sort: Visit Fee (Low to High)</option>
+          <option value="reviews">Sort: Most Jobs Completed</option>
+        </select>
+      </div>
+
+      <div class="chip-group" id="categoryFilters">
+        <button type="button" class="chip active" data-category="All">All Specialists</button>
+        <button type="button" class="chip" data-category="Hardware">Hardware &amp; Motherboard</button>
+        <button type="button" class="chip" data-category="Software & OS">Software &amp; OS</button>
+        <button type="button" class="chip" data-category="MacBook">MacBook</button>
+        <button type="button" class="chip" data-category="Data & Storage">Data &amp; Storage</button>
+        <button type="button" class="chip" data-category="Gaming & Desktop">Gaming &amp; Desktop</button>
+      </div>
+    </div>
+
+    <p class="results-meta" id="resultsCount"></p>
+
+    <!-- Specialists Grid -->
+    <section id="specialistsGrid" class="specialists-grid"></section>
+  </main>
+
+  <script src="js/technicians-data.js"></script>
+  <script>
+    (function () {
+      const STORAGE_KEY = "bytefix_pc_bookings_v1";
+      const list = Array.isArray(window.TECHNICIANS_DATA) ? window.TECHNICIANS_DATA : [];
+
+      const grid = document.getElementById("specialistsGrid");
+      const searchInput = document.getElementById("searchInput");
+      const sortSelect = document.getElementById("sortSelect");
+      const resultsCount = document.getElementById("resultsCount");
+      let activeCategory = "All";
+
+      function updateBadge() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+          const badge = document.getElementById("navBookingCount");
+          if (badge) badge.textContent = String(Array.isArray(saved) ? saved.length : 0);
+        } catch (e) {}
+      }
+
+      function renderCards() {
+        const query = searchInput.value.trim().toLowerCase();
+        const sortBy = sortSelect.value;
+
+        let filtered = list.filter((t) => {
+          const matchesCat = activeCategory === "All" || t.category === activeCategory;
+          const haystack = [t.name, t.specialty, t.category, t.bio, ...(t.skills || [])]
+            .join(" ")
+            .toLowerCase();
+          const matchesQuery = !query || haystack.includes(query);
+          return matchesCat && matchesQuery;
+        });
+
+        filtered.sort((a, b) =>
