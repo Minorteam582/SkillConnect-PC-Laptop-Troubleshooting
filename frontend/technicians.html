@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technicians - SkillConnect</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.filters{max-width:700px;margin:-30px auto 0;background:#fff;padding:24px;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.12);display:flex;gap:14px;flex-wrap:wrap;}
+.filters select{flex:1;min-width:180px;padding:12px;border:1px solid #cfdcdc;border-radius:8px;font-family:inherit;font-size:15px;}
+.tag{display:inline-block;background:var(--main);color:#fff;padding:2px 12px;border-radius:20px;font-size:12px;margin-bottom:8px;}
+.page-title{background:var(--dark);color:#fff;text-align:center;padding:50px 8%;}
+.page-title h1{font-size:34px;}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="logo">Skill<span>Connect</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="search.html">Search Problem</a></li>
+    <li><a href="technicians.html" class="active">Technicians</a></li>
+    <li><a href="login.html">Login</a></li>
+  </ul>
+</nav>
+
+<div class="page-title"><h1>Find a Technician</h1></div>
+
+<div class="filters">
+  <select id="city">
+    <option value="all">All Cities</option>
+    <option>Bhopal</option>
+    <option>Indore</option>
+    <option>Jabalpur</option>
+    <option>Gwalior</option>
+  </select>
+  <select id="skill">
+    <option value="all">All Skills</option>
+    <option>Laptop Repair</option>
+    <option>Desktop Repair</option>
+    <option>Screen Replacement</option>
+    <option>Data Recovery</option>
+    <option>Virus Removal</option>
+  </select>
+</div>
+
+<section class="section">
+  <div class="cards" id="list"></div>
+</section>
+
+<footer class="footer">&copy; 2026 SkillConnect | Group 43</footer>
+
+<script src="js/technicians-data.js"></script>
+<script>
+const cityEl = document.getElementById('city');
+const skillEl = document.getElementById('skill');
+const list = document.getElementById('list');
+
+function show() {
+  const c = cityEl.value, s = skillEl.value;
+  const res = technicians.filter(t => (c === 'all' || t.city === c) && (s === 'all' || t.skill === s));
+  list.innerHTML = res.length ? res.map(t => `
+    <div class="card">
+      <span class="tag">${t.skill}</span>
+      <h3>${t.name}</h3>
+      <p>${t.city} | ${t.experience} years experience</p>
+      <p>Rating: ${t.rating} / 5</p>
+      <p>Visit charge: ₹${t.price}</p><br>
+      <a href="booking.html?id=${t.id}" class="btn">Book Now</a>
+    </div>`).join('') : '<p>No technician found.</p>';
+}
+cityEl.onchange = show;
+skillEl.onchange = show;
+show();
+</script>
+</body>
+</html>

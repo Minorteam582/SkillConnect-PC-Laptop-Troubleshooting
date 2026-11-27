@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Bookings - SkillConnect</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.status{display:inline-block;padding:3px 14px;border-radius:20px;font-size:13px;font-weight:600;color:#fff;background:var(--accent);margin-bottom:8px;}
+.status.Cancelled{background:#c8553d;}
+.cancel-btn{margin-top:12px;padding:8px 18px;border:none;border-radius:8px;background:#c8553d;color:#fff;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="logo">Skill<span>Connect</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="search.html">Search Problem</a></li>
+    <li><a href="technicians.html" class="active">Technicians</a></li>
+    <li><a href="login.html">Login</a></li>
+  </ul>
+</nav>
+
+<div class="page-title"><h1>My Bookings</h1></div>
+
+<section class="section">
+  <div class="cards" id="bookingList"></div>
+</section>
+
+<footer class="footer">&copy; 2026 SkillConnect | Group 43</footer>
+
+<script>
+function render() {
+  const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+  const list = document.getElementById('bookingList');
+  if (!bookings.length) {
+    list.innerHTML = '<p>No bookings yet. <a href="technicians.html">Book a technician</a></p>';
+    return;
+  }
+  list.innerHTML = bookings.map(b => `
+    <div class="card">
+      <span class="status ${b.status}">${b.status}</span>
+      <h3>${b.techName}</h3>
+      <p>${b.skill}</p>
+      <p><b>Date:</b> ${b.date}</p>
+      <p><b>Problem:</b> ${b.problem}</p>
+      <p><b>Address:</b> ${b.address}</p>
+      ${b.status === 'Pending' ? `<button class="cancel-btn" onclick="cancelBooking(${b.id})">Cancel Booking</button>` : ''}
+    </div>`).join('');
+}
+function cancelBooking(id) {
+  const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+  const b = bookings.find(x => x.id === id);
+  if (b) b.status = 'Cancelled';
+  localStorage.setItem('bookings', JSON.stringify(bookings));
+  render();
+}
+render();
+</script>
+</body>
+</html>

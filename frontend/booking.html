@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Technician - SkillConnect</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.form-box{max-width:520px;margin:40px auto;background:#fff;padding:32px;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.12);}
+.form-box h2{color:var(--dark);text-align:center;margin-bottom:16px;}
+.tech-info{background:var(--light);padding:16px;border-radius:10px;margin-bottom:10px;}
+.form-box label{display:block;margin:12px 0 4px;font-weight:500;}
+.form-box input,.form-box select,.form-box textarea{width:100%;padding:12px;border:1px solid #cfdcdc;border-radius:8px;font-family:inherit;font-size:15px;}
+.form-box .btn{width:100%;margin-top:22px;}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="logo">Skill<span>Connect</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="search.html">Search Problem</a></li>
+    <li><a href="technicians.html" class="active">Technicians</a></li>
+    <li><a href="login.html">Login</a></li>
+  </ul>
+</nav>
+
+<div class="page-title"><h1>Book a Technician</h1></div>
+
+<div class="form-box">
+  <div class="tech-info" id="techInfo"></div>
+  <form id="bookForm" autocomplete="off">
+    <label>Your Name</label>
+    <input type="text" id="name" autocomplete="off" required>
+    <label>Phone Number</label>
+    <input type="tel" id="phone" pattern="[0-9]{10}" title="Enter 10 digit number" autocomplete="off" required>
+    <label>Address</label>
+    <input type="text" id="address" autocomplete="off" required>
+    <label>Preferred Date</label>
+    <input type="date" id="date" required>
+    <label>Time Slot</label>
+    <select id="slot" required>
+      <option value="">Select a time slot</option>
+      <option>10:00 AM - 12:00 PM</option>
+      <option>12:00 PM - 02:00 PM</option>
+      <option>02:00 PM - 04:00 PM</option>
+      <option>04:00 PM - 06:00 PM</option>
+    </select>
+        <label>Preferred Time</label>
+    <input type="time" id="time" min="09:00" max="18:00" required>
+    <label>Describe the Problem</label>
+    <textarea id="problem" rows="3" autocomplete="off" required></textarea>
+    <button type="submit" class="btn">Confirm Booking</button>
+  </form>
+</div>
+
+<footer class="footer">&copy; 2026 SkillConnect | Group 43</footer>
+
+<script src="js/technicians-data.js"></script>
+<script>
+const id = Number(new URLSearchParams(location.search).get('id'));
+const tech = technicians.find(t => t.id === id);
+const box = document.getElementById('techInfo');
+document.getElementById('date').min = new Date().toISOString().split('T')[0];
+
+if (tech) {
+  box.innerHTML = `<h3>${tech.name}</h3><p>${tech.skill} | ${tech.city} | ₹${tech.price} visit charge</p>`;
+} else {
+  box.innerHTML = '<p>Please choose a technician first. <a href="technicians.html">Go to Technicians</a></p>';
+}
+
+document.getElementById('bookForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  if (!tech) { alert('Please choose a technician first.'); return; }
+  const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+  bookings.push({
+    id: Date.now(),
+    techName: tech.name,
+    skill: tech.skill,
+    name: document.getElementById('name').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    address: document.getElementById('address').value.trim(),
+    date: document.getElementById('date').value,
+    slot: document.getElementById('slot').value,
+    problem: document.getElementById('problem').value.trim(),
+    status: 'Pending'
+  });
+  localStorage.setItem('bookings', JSON.stringify(bookings));
+  alert('Booking successful!');
+  location.href = 'my-bookings.html';
+});
+</script>
+</body>
+</html>

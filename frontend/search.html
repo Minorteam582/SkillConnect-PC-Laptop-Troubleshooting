@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Problem - SkillConnect</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="logo">Skill<span>Connect</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="search.html" class="active">Search Problem</a></li>
+    <li><a href="technicians.html">Technicians</a></li>
+    <li><a href="login.html">Login</a></li>
+  </ul>
+</nav>
+
+<div class="page-title"><h1>Search Your Problem</h1></div>
+
+<div class="search-box">
+  <select id="device">
+    <option value="all">All Devices</option>
+    <option value="Laptop">Laptop</option>
+    <option value="PC">PC / Desktop</option>
+  </select>
+  <input type="text" id="keyword" placeholder="Type a problem, e.g. slow, heating, wifi">
+</div>
+
+<section class="section">
+  <div class="cards" id="results"></div>
+</section>
+
+<footer class="footer">&copy; 2026 SkillConnect | Group 43</footer>
+
+<script src="js/problems-data.js"></script>
+<script>
+const deviceEl = document.getElementById('device');
+const keywordEl = document.getElementById('keyword');
+const results = document.getElementById('results');
+
+function show() {
+  const d = deviceEl.value;
+  const k = keywordEl.value.trim().toLowerCase();
+  const list = problems.filter(p => {
+    const deviceOk = d === 'all' || p.device === 'Both' || (d === 'Laptop' && p.device === 'Laptop') || (d === 'PC' && p.device !== 'Laptop');
+    const textOk = !k || p.title.toLowerCase().includes(k) || p.summary.toLowerCase().includes(k) || p.category.toLowerCase().includes(k);
+    return deviceOk && textOk;
+  });
+  results.innerHTML = list.length ? list.map(p => `
+    <div class="card">
+      <span class="tag">${p.category}</span>
+      <h3>${p.title}</h3>
+      <p>${p.summary}</p><br>
+      <a href="fix.html?id=${p.id}" class="btn">View Fix</a>
+    </div>`).join('') : '<p>No problem found. Try another word.</p>';
+}
+
+deviceEl.onchange = show;
+keywordEl.oninput = show;
+const q = new URLSearchParams(location.search).get('q');
+if (q) keywordEl.value = q;
+show();</script>
+</body>
+</html>
